@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MathDrill</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0d0d0d;
+      --surface: #161616;
+      --card: #1e1e1e;
+      --accent: #f5e642;
+      --accent2: #42f5c5;
+      --danger: #ff4d6d;
+      --text: #f0f0f0;
+      --muted: #666;
+      --border: #2a2a2a;
+      --radius: 12px;
+      --mono: 'Space Mono', monospace;
+      --display: 'Syne', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--mono);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      overflow-x: hidden;
+    }
+
+    /* Subtle grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(245,230,66,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(245,230,66,.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrapper {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 560px;
+    }
+
+    /* ── Header ── */
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      animation: fadeDown .5s ease both;
+    }
+    header h1 {
+      font-family: var(--display);
+      font-size: clamp(2.2rem, 7vw, 3.2rem);
+      font-weight: 800;
+      letter-spacing: -1px;
+      color: var(--accent);
+    }
+    header p {
+      color: var(--muted);
+      font-size: .8rem;
+      margin-top: .4rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    /* ── Score bar ── */
+    .scorebar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: .75rem 1.25rem;
+      margin-bottom: 1.5rem;
+      font-size: .75rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      animation: fadeDown .5s .1s ease both;
+    }
+    .scorebar .stat { display: flex; flex-direction: column; align-items: center; gap: .2rem; }
+    .scorebar .stat .val { font-size: 1.4rem; font-family: var(--display); font-weight: 700; color: var(--accent); }
+    .scorebar .stat.wrong .val { color: var(--danger); }
+    .scorebar .stat.streak .val { color: var(--accent2); }
+
+    /* ── Question card ── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2.5rem 2rem;
+      text-align: center;
+      animation: fadeDown .5s .2s ease both;
+      position: relative;
+      overflow: hidden;
+    }
+    .card::after {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 160px; height: 160px;
+      background: radial-gradient(circle, rgba(245,230,66,.12), transparent 70%);
+      pointer-events: none;
+    }
+
+    .difficulty-badge {
+      display: inline-block;
+      font-size: .65rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: .25rem .75rem;
+      border-radius: 99px;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+    }
+
+    /* Flash messages */
+    .flash {
+      padding: .6rem 1rem;
+      border-radius: 8px;
+      font-size: .8rem;
+      margin-bottom: 1.2rem;
+      text-align: left;
+    }
+    .flash.success { background: rgba(66,245,197,.1); border: 1px solid var(--accent2); color: var(--accent2); }
+    .flash.error   { background: rgba(255,77,109,.1);  border: 1px solid var(--danger); color: var(--danger); }
+    .flash.info    { background: rgba(245,230,66,.08); border: 1px solid var(--accent); color: var(--accent); }
+
+    /* The equation display */
+    .equation {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin: .5rem 0 2rem;
+    }
+    .eq-num {
+      font-family: var(--display);
+      font-size: clamp(2.8rem, 10vw, 4rem);
+      font-weight: 800;
+      line-height: 1;
+    }
+    .eq-op {
+      font-family: var(--display);
+      font-size: clamp(2rem, 7vw, 3rem);
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+    }
+    .eq-blank {
+      width: clamp(80px, 22vw, 120px);
+      height: clamp(56px, 14vw, 76px);
+      border: 2px solid var(--accent);
+      border-radius: 8px;
+      background: rgba(245,230,66,.05);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--display);
+      font-size: clamp(2rem, 7vw, 3rem);
+      font-weight: 700;
+      color: var(--accent2);
+    }
+    .eq-equals {
+      font-family: var(--display);
+      font-size: clamp(2rem, 7vw, 3rem);
+      font-weight: 700;
+      color: var(--muted);
+      line-height: 1;
+    }
+
+    /* Answer form */
+    .answer-form {
+      display: flex;
+      gap: .75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .answer-form input[type="number"] {
+      width: 140px;
+      padding: .85rem 1rem;
+      font-family: var(--display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-align: center;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      transition: border-color .2s;
+      outline: none;
+      -moz-appearance: textfield;
+    }
+    .answer-form input[type="number"]::-webkit-inner-spin-button,
+    .answer-form input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+    .answer-form input[type="number"]:focus { border-color: var(--accent); }
+
+    .btn {
+      padding: .85rem 1.5rem;
+      font-family: var(--mono);
+      font-size: .85rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform .15s, opacity .15s;
+    }
+    .btn:active { transform: scale(.97); }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #0d0d0d;
+    }
+    .btn-primary:hover { opacity: .88; }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .btn-ghost:hover { border-color: var(--accent2); color: var(--accent2); }
+
+    /* ── Controls ── */
+    .controls {
+      display: flex;
+      gap: .75rem;
+      justify-content: center;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+      animation: fadeDown .5s .3s ease both;
+    }
+
+    /* ── Difficulty selector ── */
+    .diff-row {
+      display: flex;
+      gap: .5rem;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      animation: fadeDown .5s .15s ease both;
+    }
+    .diff-btn {
+      padding: .4rem 1rem;
+      font-family: var(--mono);
+      font-size: .72rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      border-radius: 99px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      background: var(--surface);
+      cursor: pointer;
+      transition: all .2s;
+      text-decoration: none;
+    }
+    .diff-btn:hover, .diff-btn.active {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pop {
+      0%  { transform: scale(1); }
+      40% { transform: scale(1.12); }
+      100%{ transform: scale(1); }
+    }
+    .pop { animation: pop .3s ease; }
+
+    /* ── Result overlay (shown via JS) ── */
+    .result-overlay {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(13,13,13,.92);
+      border-radius: var(--radius);
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: .75rem;
+      z-index: 10;
+    }
+    .result-overlay.show { display: flex; }
+    .result-icon { font-size: 3rem; }
+    .result-msg { font-family: var(--display); font-size: 1.4rem; font-weight: 700; }
+    .result-msg.correct { color: var(--accent2); }
+    .result-msg.wrong   { color: var(--danger); }
+    .result-sub { font-size: .8rem; color: var(--muted); }
+  </style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <!-- Header -->
+  <header>
+    <h1>MathDrill</h1>
+    <p>Sharpen your arithmetic</p>
+  </header>
+
+  <!-- Score bar -->
+  <div class="scorebar">
+    <div class="stat">
+      <span class="val" id="score-correct">{{ correct | default(0) }}</span>
+      <span>Correct</span>
+    </div>
+    <div class="stat wrong">
+      <span class="val" id="score-wrong">{{ wrong | default(0) }}</span>
+      <span>Wrong</span>
+    </div>
+    <div class="stat streak">
+      <span class="val" id="score-streak">{{ streak | default(0) }}</span>
+      <span>Streak</span>
+    </div>
+    <div class="stat">
+      <span class="val" id="score-total">{{ total | default(0) }}</span>
+      <span>Total</span>
+    </div>
+  </div>
+
+  <!-- Difficulty selector -->
+  <div class="diff-row">
+    <a href="{{ url_for('set_difficulty', level='easy') }}"
+       class="diff-btn {% if difficulty == 'easy' %}active{% endif %}">Easy</a>
+    <a href="{{ url_for('set_difficulty', level='medium') }}"
+       class="diff-btn {% if difficulty == 'medium' %}active{% endif %}">Medium</a>
+    <a href="{{ url_for('set_difficulty', level='hard') }}"
+       class="diff-btn {% if difficulty == 'hard' %}active{% endif %}">Hard</a>
+  </div>
+
+  <!-- Question card -->
+  <div class="card">
+
+    <!-- Result overlay (revealed by JS, auto-hides) -->
+    <div class="result-overlay" id="result-overlay">
+      <div class="result-icon" id="result-icon">✓</div>
+      <div class="result-msg" id="result-msg">Correct!</div>
+      <div class="result-sub" id="result-sub"></div>
+    </div>
+
+    <div class="difficulty-badge">{{ difficulty | default('easy') | capitalize }}</div>
+
+    <!-- Flash messages from Flask -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Equation display: num1  op  num2  =  [ answer ] -->
+    <div class="equation">
+      <span class="eq-num">{{ num1 | default(5) }}</span>
+      <span class="eq-op">{{ op | default('+') }}</span>
+      <span class="eq-num">{{ num2 | default(8) }}</span>
+      <span class="eq-equals">=</span>
+      <div class="eq-blank" id="eq-blank">
+        {% if last_answer is defined and last_answer != '' %}
+          {{ last_answer }}
+        {% else %}
+          ?
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Answer form -->
+    <form class="answer-form" method="POST" action="{{ url_for('check_answer') }}" id="answer-form">
+      <input
+        type="number"
+        name="answer"
+        id="answer-input"
+        placeholder="?"
+        autocomplete="off"
+        autofocus
+        required
+      />
+      <button type="submit" class="btn btn-primary">Check →</button>
+    </form>
+
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <a href="{{ url_for('new_question') }}" class="btn btn-ghost">Skip question</a>
+    <a href="{{ url_for('reset') }}" class="btn btn-ghost">Reset scores</a>
+  </div>
+
+</div>
+
+<script>
+  // Show result overlay briefly if Flask sent a result via flash or template var
+  const resultStatus = "{{ result | default('') }}";   // 'correct' | 'wrong' | ''
+  const correctAnswer = "{{ correct_answer | default('') }}";
+
+  if (resultStatus) {
+    const overlay = document.getElementById('result-overlay');
+    const icon    = document.getElementById('result-icon');
+    const msg     = document.getElementById('result-msg');
+    const sub     = document.getElementById('result-sub');
+
+    if (resultStatus === 'correct') {
+      icon.textContent = '✓';
+      msg.textContent  = 'Correct!';
+      msg.className    = 'result-msg correct';
+      sub.textContent  = '';
+    } else {
+      icon.textContent = '✗';
+      msg.textContent  = 'Not quite…';
+      msg.className    = 'result-msg wrong';
+      sub.textContent  = correctAnswer ? `Answer was ${correctAnswer}` : '';
+    }
+
+    overlay.classList.add('show');
+    setTimeout(() => overlay.classList.remove('show'), 1400);
+  }
+
+  // Focus input on page load
+  document.getElementById('answer-input')?.focus();
+
+  // Submit on Enter (already works via form, but also clear input nicely)
+  document.getElementById('answer-form').addEventListener('submit', () => {
+    document.getElementById('eq-blank').classList.add('pop');
+  });
+</script>
+
+</body>
+</html>
