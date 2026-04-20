@@ -7,17 +7,19 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
   <style>
     :root {
-      --bg: #0d0d0d;
-      --surface: #161616;
-      --card: #1e1e1e;
-      --accent: #f5e642;
-      --accent2: #42f5c5;
-      --danger: #ff4d6d;
-      --text: #f0f0f0;
-      --muted: #666;
-      --border: #2a2a2a;
-      --radius: 12px;
+      --bg:      #FAEBD7;
+      --surface: #F0D9BC;
+      --card:    #FDF6EC;
+      --accent:  #B5451B;
+      --accent2: #2E7D5E;
+      --danger:  #C0392B;
+      --random:  #7B3FA0;
+      --text:    #2C1A0E;
+      --muted:   #8C7260;
+      --border:  #D4B896;
+      --radius:  12px;
       --mono: 'Space Mono', monospace;
+      --arial:    'Arial', sans-serif;
       --display: 'Syne', sans-serif;
     }
 
@@ -26,7 +28,7 @@
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: var(--mono);
+      font-family: var(--arial);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -36,14 +38,13 @@
       overflow-x: hidden;
     }
 
-    /* Subtle grid background */
     body::before {
       content: '';
       position: fixed;
       inset: 0;
       background-image:
-        linear-gradient(rgba(245,230,66,.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(245,230,66,.04) 1px, transparent 1px);
+        linear-gradient(rgba(44,26,14,.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(44,26,14,.06) 1px, transparent 1px);
       background-size: 40px 40px;
       pointer-events: none;
       z-index: 0;
@@ -53,29 +54,31 @@
       position: relative;
       z-index: 1;
       width: 100%;
-      max-width: 560px;
+      max-width: 580px;
     }
 
     /* ── Header ── */
     header {
       text-align: center;
-      margin-bottom: 2.5rem;
-      animation: fadeDown .5s ease both;
+      margin-bottom: 2rem;
+      animation: fadeDown .45s ease both;
     }
     header h1 {
       font-family: var(--display);
-      font-size: clamp(2.2rem, 7vw, 3.2rem);
+      font-size: clamp(2rem, 7vw, 3rem);
       font-weight: 800;
       letter-spacing: -1px;
       color: var(--accent);
     }
     header p {
       color: var(--muted);
-      font-size: .8rem;
-      margin-top: .4rem;
-      letter-spacing: .08em;
+      font-size: .75rem;
+      margin-top: .3rem;
+      letter-spacing: .1em;
       text-transform: uppercase;
     }
+
+  
 
     /* ── Score bar ── */
     .scorebar {
@@ -85,26 +88,89 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: .75rem 1.25rem;
-      margin-bottom: 1.5rem;
-      font-size: .75rem;
+      padding: .7rem 1.2rem;
+      margin-bottom: 1rem;
+      font-size: .7rem;
       letter-spacing: .06em;
       text-transform: uppercase;
-      animation: fadeDown .5s .1s ease both;
+      animation: fadeDown .45s .08s ease both;
     }
-    .scorebar .stat { display: flex; flex-direction: column; align-items: center; gap: .2rem; }
-    .scorebar .stat .val { font-size: 1.4rem; font-family: var(--display); font-weight: 700; color: var(--accent); }
-    .scorebar .stat.wrong .val { color: var(--danger); }
-    .scorebar .stat.streak .val { color: var(--accent2); }
+    .stat { display: flex; flex-direction: column; align-items: center; gap: .15rem; }
+    .stat .val {
+      font-size: 1.35rem;
+      font-family: var(--display);
+      color: var(--accent);
+    }
+    .stat.wrong  .val { color: var(--danger); }
+    .stat.streak .val { color: var(--accent2); }
 
-    /* ── Question card ── */
+    /* ── Row of selectors ── */
+    .diff-row, .style-row {
+      display: flex;
+      gap: .5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: fadeDown .45s .14s ease both;
+    }
+    .diff-row  { margin-bottom: .6rem; }
+    .style-row { margin-bottom: 1.1rem; }
+
+    .diff-btn, .style-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .2rem;
+      padding: .45rem 1rem;
+      font-family: var(--arial);
+      font-size: .7rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      border-radius: 99px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      background: var(--surface);
+      cursor: pointer;
+      transition: all .2s;
+      text-decoration: none;
+    }
+    .diff-btn .pill-sub {
+      font-size: .55rem;
+      letter-spacing: .04em;
+      opacity: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: opacity .2s, max-height .2s;
+    }
+    .diff-btn.active .pill-sub,
+    .diff-btn:hover  .pill-sub { opacity: 1; max-height: 20px; }
+
+    .diff-btn[data-level="easy"]:hover,   .diff-btn[data-level="easy"].active   { border-color: var(--accent2); color: var(--accent2); }
+    .diff-btn[data-level="medium"]:hover, .diff-btn[data-level="medium"].active { border-color: var(--accent);  color: var(--accent); }
+    .diff-btn[data-level="hard"]:hover,   .diff-btn[data-level="hard"].active   { border-color: var(--danger);  color: var(--danger); }
+    .diff-btn[data-level="extra_hard"]:hover, .diff-btn[data-level="extra_hard"].active { border-color: #8B0000; color: #8B0000; }
+    .diff-btn[data-level="random"]:hover, .diff-btn[data-level="random"].active { border-color: var(--random);  color: var(--random); }
+
+    /* style toggle buttons */
+    .style-btn:hover, .style-btn.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(181,69,27,.06);
+    }
+    .style-btn .style-preview {
+      font-family: var(--display);
+      font-size: .85rem;
+      font-weight: 700;
+      margin-bottom: .1rem;
+    }
+
+    /* ── Card ── */
     .card {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 2.5rem 2rem;
       text-align: center;
-      animation: fadeDown .5s .2s ease both;
+      animation: fadeDown .45s .2s ease both;
       position: relative;
       overflow: hidden;
     }
@@ -113,46 +179,61 @@
       position: absolute;
       top: -60px; right: -60px;
       width: 160px; height: 160px;
-      background: radial-gradient(circle, rgba(245,230,66,.12), transparent 70%);
+      background: radial-gradient(circle, rgba(181,69,27,.08), transparent 70%);
       pointer-events: none;
     }
 
-    .difficulty-badge {
-      display: inline-block;
-      font-size: .65rem;
+    .card-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      font-size: .62rem;
       letter-spacing: .1em;
       text-transform: uppercase;
-      padding: .25rem .75rem;
+      padding: .25rem .85rem;
       border-radius: 99px;
-      border: 1px solid var(--accent);
-      color: var(--accent);
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.4rem;
+    }
+    .card-badge.easy       { border: 1px solid var(--accent2); color: var(--accent2); }
+    .card-badge.medium     { border: 1px solid var(--accent);  color: var(--accent); }
+    .card-badge.hard       { border: 1px solid var(--danger);  color: var(--danger); }
+    .card-badge.extra_hard { border: 1px solid #8B0000;        color: #8B0000; }
+    .card-badge.random     { border: 1px solid var(--random);  color: var(--random); }
+
+    .badge-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      display: inline-block;
+      animation: pulse 1.4s ease-in-out infinite;
     }
 
-    /* Flash messages */
+    /* ── Flash messages ── */
     .flash {
-      padding: .6rem 1rem;
+      padding: .55rem .9rem;
       border-radius: 8px;
-      font-size: .8rem;
-      margin-bottom: 1.2rem;
+      font-size: .78rem;
+      margin-bottom: 1.1rem;
       text-align: left;
     }
-    .flash.success { background: rgba(66,245,197,.1); border: 1px solid var(--accent2); color: var(--accent2); }
-    .flash.error   { background: rgba(255,77,109,.1);  border: 1px solid var(--danger); color: var(--danger); }
-    .flash.info    { background: rgba(245,230,66,.08); border: 1px solid var(--accent); color: var(--accent); }
+    .flash.success { background: rgba(46,125,94,.1);  border: 1px solid var(--accent2); color: var(--accent2); }
+    .flash.error   { background: rgba(192,57,43,.1);  border: 1px solid var(--danger);  color: var(--danger); }
+    .flash.info    { background: rgba(181,69,27,.08); border: 1px solid var(--accent);  color: var(--accent); }
 
-    /* The equation display */
+    /* ════════════════════════════════════════
+       INLINE style:  5  +  8  =  [ ? ]
+    ════════════════════════════════════════ */
     .equation {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 1rem;
+      gap: .9rem;
       flex-wrap: wrap;
       margin: .5rem 0 2rem;
     }
     .eq-num {
       font-family: var(--display);
-      font-size: clamp(2.8rem, 10vw, 4rem);
+      font-size: clamp(2.6rem, 10vw, 4rem);
       font-weight: 800;
       line-height: 1;
     }
@@ -163,18 +244,6 @@
       color: var(--accent);
       line-height: 1;
     }
-    .eq-blank {
-      width: clamp(80px, 22vw, 120px);
-      height: clamp(56px, 14vw, 76px);
-      border: 2px solid var(--accent);
-      border-radius: 8px;
-      background: rgba(245,230,66,.05);
-      display: flex; align-items: center; justify-content: center;
-      font-family: var(--display);
-      font-size: clamp(2rem, 7vw, 3rem);
-      font-weight: 700;
-      color: var(--accent2);
-    }
     .eq-equals {
       font-family: var(--display);
       font-size: clamp(2rem, 7vw, 3rem);
@@ -182,8 +251,85 @@
       color: var(--muted);
       line-height: 1;
     }
+    .eq-blank {
+      width: clamp(80px, 24vw, 130px);
+      height: clamp(56px, 14vw, 76px);
+      border: 2px solid var(--accent);
+      border-radius: 8px;
+      background: rgba(181,69,27,.05);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--display);
+      font-size: clamp(1.8rem, 7vw, 3rem);
+      font-weight: 700;
+      color: var(--accent2);
+    }
 
-    /* Answer form */
+    /* ════════════════════════════════════════
+       STACKED style  (column addition layout)
+          1 2 3
+        +   4 5
+        ───────
+          [ ? ]
+    ════════════════════════════════════════ */
+    .stacked-wrap {
+      display: inline-block;
+      margin: .5rem auto 2rem;
+      font-family: var(--display);
+      font-weight: 200;
+    }
+    .stacked-row {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 0;
+      line-height: 1.1;
+    }
+    /* operator column */
+    .stacked-op {
+      font-size: clamp(1.8rem, 7vw, 3rem);
+      color: var(--accent);
+      width: 2.2rem;
+      text-align: left;
+      padding-right: .2rem;
+    }
+    /* digit cells */
+    .stacked-num {
+      font-size: clamp(2.2rem, 9vw, 3.6rem);
+      min-width: 2.4rem;
+      text-align: center;
+    }
+    /* placeholder cell (keeps alignment when num2 is shorter) */
+    .stacked-num.empty { visibility: hidden; }
+
+    /* divider line */
+    .stacked-divider {
+      border: none;
+      border-top: 3px solid var(--text);
+      margin: .4rem 0;
+      width: 100%;
+    }
+
+    /* answer blank in stacked mode */
+    .stacked-blank-row {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 0;
+      padding-top: .3rem;
+    }
+    .stacked-blank {
+      min-width: 2.4rem;
+      height: clamp(48px, 12vw, 68px);
+      border: 2px solid var(--accent);
+      border-radius: 8px;
+      background: rgba(181,69,27,.05);
+      display: flex; align-items: center; justify-content: center;
+      font-size: clamp(1.8rem, 7vw, 3rem);
+      color: var(--accent2);
+      /* spans all digit columns */
+    }
+
+    /* ── Answer form ── */
     .answer-form {
       display: flex;
       gap: .75rem;
@@ -209,10 +355,11 @@
     .answer-form input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
     .answer-form input[type="number"]:focus { border-color: var(--accent); }
 
+    /* ── Buttons ── */
     .btn {
-      padding: .85rem 1.5rem;
-      font-family: var(--mono);
-      font-size: .85rem;
+      padding: .8rem 1.4rem;
+      font-family: var(--arial);
+      font-size: .82rem;
       font-weight: 700;
       letter-spacing: .06em;
       text-transform: uppercase;
@@ -220,15 +367,12 @@
       border-radius: 10px;
       cursor: pointer;
       transition: transform .15s, opacity .15s;
+      text-decoration: none;
+      display: inline-block;
     }
     .btn:active { transform: scale(.97); }
-
-    .btn-primary {
-      background: var(--accent);
-      color: #0d0d0d;
-    }
-    .btn-primary:hover { opacity: .88; }
-
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { opacity: .85; }
     .btn-ghost {
       background: transparent;
       border: 1px solid var(--border);
@@ -236,75 +380,51 @@
     }
     .btn-ghost:hover { border-color: var(--accent2); color: var(--accent2); }
 
-    /* ── Controls ── */
+    /* ── Bottom controls ── */
     .controls {
       display: flex;
       gap: .75rem;
       justify-content: center;
-      margin-top: 1.5rem;
+      margin-top: 1.4rem;
       flex-wrap: wrap;
-      animation: fadeDown .5s .3s ease both;
+      animation: fadeDown .45s .3s ease both;
     }
 
-    /* ── Difficulty selector ── */
-    .diff-row {
-      display: flex;
-      gap: .5rem;
-      justify-content: center;
-      margin-bottom: 1.5rem;
-      flex-wrap: wrap;
-      animation: fadeDown .5s .15s ease both;
-    }
-    .diff-btn {
-      padding: .4rem 1rem;
-      font-family: var(--mono);
-      font-size: .72rem;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      border-radius: 99px;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      background: var(--surface);
-      cursor: pointer;
-      transition: all .2s;
-      text-decoration: none;
-    }
-    .diff-btn:hover, .diff-btn.active {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-
-    /* ── Animations ── */
-    @keyframes fadeDown {
-      from { opacity: 0; transform: translateY(-12px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes pop {
-      0%  { transform: scale(1); }
-      40% { transform: scale(1.12); }
-      100%{ transform: scale(1); }
-    }
-    .pop { animation: pop .3s ease; }
-
-    /* ── Result overlay (shown via JS) ── */
+    /* ── Result overlay ── */
     .result-overlay {
       display: none;
       position: absolute;
       inset: 0;
-      background: rgba(13,13,13,.92);
+      background: rgba(250,235,215,.92);
       border-radius: var(--radius);
       align-items: center;
       justify-content: center;
       flex-direction: column;
-      gap: .75rem;
+      gap: .7rem;
       z-index: 10;
     }
     .result-overlay.show { display: flex; }
     .result-icon { font-size: 3rem; }
-    .result-msg { font-family: var(--display); font-size: 1.4rem; font-weight: 700; }
+    .result-msg  { font-family: var(--display); font-size: 1.4rem; font-weight: 700; }
     .result-msg.correct { color: var(--accent2); }
     .result-msg.wrong   { color: var(--danger); }
-    .result-sub { font-size: .8rem; color: var(--muted); }
+    .result-sub  { font-size: .78rem; color: var(--muted); }
+
+    /* ── Animations ── */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: .4; transform: scale(.6); }
+    }
+    @keyframes pop {
+      0%  { transform: scale(1); }
+      40% { transform: scale(1.1); }
+      100%{ transform: scale(1); }
+    }
+    .pop { animation: pop .3s ease; }
   </style>
 </head>
 <body>
@@ -320,19 +440,19 @@
   <!-- Score bar -->
   <div class="scorebar">
     <div class="stat">
-      <span class="val" id="score-correct">{{ correct | default(0) }}</span>
+      <span class="val">{{ correct | default(0) }}</span>
       <span>Correct</span>
     </div>
     <div class="stat wrong">
-      <span class="val" id="score-wrong">{{ wrong | default(0) }}</span>
+      <span class="val">{{ wrong | default(0) }}</span>
       <span>Wrong</span>
     </div>
     <div class="stat streak">
-      <span class="val" id="score-streak">{{ streak | default(0) }}</span>
+      <span class="val">{{ streak | default(0) }}</span>
       <span>Streak</span>
     </div>
     <div class="stat">
-      <span class="val" id="score-total">{{ total | default(0) }}</span>
+      <span class="val">{{ total | default(0) }}</span>
       <span>Total</span>
     </div>
   </div>
@@ -340,26 +460,60 @@
   <!-- Difficulty selector -->
   <div class="diff-row">
     <a href="{{ url_for('set_difficulty', level='easy') }}"
-       class="diff-btn {% if difficulty == 'easy' %}active{% endif %}">Easy</a>
+       class="diff-btn {% if difficulty == 'easy' %}active{% endif %}" data-level="easy">
+      Easy<span class="pill-sub">1d + 1d</span>
+    </a>
     <a href="{{ url_for('set_difficulty', level='medium') }}"
-       class="diff-btn {% if difficulty == 'medium' %}active{% endif %}">Medium</a>
+       class="diff-btn {% if difficulty == 'medium' %}active{% endif %}" data-level="medium">
+      Medium<span class="pill-sub">1d + 2d</span>
+    </a>
     <a href="{{ url_for('set_difficulty', level='hard') }}"
-       class="diff-btn {% if difficulty == 'hard' %}active{% endif %}">Hard</a>
+       class="diff-btn {% if difficulty == 'hard' %}active{% endif %}" data-level="hard">
+      Hard<span class="pill-sub">2d + 2d</span>
+    </a>
+    <a href="{{ url_for('set_difficulty', level='extra_hard') }}"
+       class="diff-btn {% if difficulty == 'extra_hard' %}active{% endif %}" data-level="extra_hard">
+      Extra Hard<span class="pill-sub">3d + 3d</span>
+    </a>
+    <a href="{{ url_for('set_difficulty', level='random') }}"
+       class="diff-btn {% if difficulty == 'random' %}active{% endif %}" data-level="random">
+      Random<span class="pill-sub">all mixed</span>
+    </a>
+  </div>
+
+  <!-- Style toggle: inline vs stacked -->
+  <div class="style-row">
+    <a href="{{ url_for('set_style', style='inline') }}"
+       class="style-btn {% if eq_style == 'inline' %}active{% endif %}">
+      <span class="style-preview">5 + 8 = ?</span>
+      Inline
+    </a>
+    <a href="{{ url_for('set_style', style='stacked') }}"
+       class="style-btn {% if eq_style == 'stacked' %}active{% endif %}">
+      <span class="style-preview">↕ Column</span>
+      Stacked
+    </a>
   </div>
 
   <!-- Question card -->
   <div class="card">
 
-    <!-- Result overlay (revealed by JS, auto-hides) -->
+    <!-- Result overlay -->
     <div class="result-overlay" id="result-overlay">
       <div class="result-icon" id="result-icon">✓</div>
-      <div class="result-msg" id="result-msg">Correct!</div>
-      <div class="result-sub" id="result-sub"></div>
+      <div class="result-msg"  id="result-msg">Correct!</div>
+      <div class="result-sub"  id="result-sub"></div>
     </div>
 
-    <div class="difficulty-badge">{{ difficulty | default('easy') | capitalize }}</div>
+    <!-- Badge -->
+    <div class="card-badge {{ difficulty | default('easy') }}">
+      <span class="badge-dot"></span>
+      {{ difficulty | default('easy') | replace('_',' ') | title }}
+      &nbsp;·&nbsp;
+      {{ sublabel | default('1-digit + 1-digit') }}
+    </div>
 
-    <!-- Flash messages from Flask -->
+    <!-- Flash messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         {% for category, message in messages %}
@@ -368,22 +522,58 @@
       {% endif %}
     {% endwith %}
 
-    <!-- Equation display: num1  op  num2  =  [ answer ] -->
+    {# ── INLINE layout ── #}
+    {% if eq_style == 'inline' %}
     <div class="equation">
       <span class="eq-num">{{ num1 | default(5) }}</span>
       <span class="eq-op">{{ op | default('+') }}</span>
       <span class="eq-num">{{ num2 | default(8) }}</span>
       <span class="eq-equals">=</span>
-      <div class="eq-blank" id="eq-blank">
-        {% if last_answer is defined and last_answer != '' %}
-          {{ last_answer }}
-        {% else %}
-          ?
-        {% endif %}
-      </div>
+      <div class="eq-blank" id="eq-blank">?</div>
     </div>
 
-    <!-- Answer form -->
+    {# ── STACKED layout ── #}
+    {% else %}
+    {% set n1 = (num1 | default(5)) | string %}
+    {% set n2 = (num2 | default(8)) | string %}
+    {% set maxlen = [n1|length, n2|length] | max %}
+
+    <div class="stacked-wrap" id="eq-blank">
+
+      {# top number row — right-aligned with padding cells #}
+      <div class="stacked-row">
+        <span class="stacked-op">&nbsp;</span>{# blank op column for top row #}
+        {% for i in range(maxlen - n1|length) %}
+          <span class="stacked-num empty">0</span>
+        {% endfor %}
+        {% for digit in n1 %}
+          <span class="stacked-num">{{ digit }}</span>
+        {% endfor %}
+      </div>
+
+      {# bottom number row with operator #}
+      <div class="stacked-row">
+        <span class="stacked-op">{{ op | default('+') }}</span>
+        {% for i in range(maxlen - n2|length) %}
+          <span class="stacked-num empty">0</span>
+        {% endfor %}
+        {% for digit in n2 %}
+          <span class="stacked-num">{{ digit }}</span>
+        {% endfor %}
+      </div>
+
+      <hr class="stacked-divider"/>
+
+      {# answer blank spans the full digit width #}
+      <div class="stacked-blank-row">
+        <span class="stacked-op">&nbsp;</span>
+        <div class="stacked-blank" style="width: calc({{ maxlen }} * 2.4rem);">?</div>
+      </div>
+
+    </div>
+    {% endif %}
+
+    <!-- Answer form (same for both styles) -->
     <form class="answer-form" method="POST" action="{{ url_for('check_answer') }}" id="answer-form">
       <input
         type="number"
@@ -401,16 +591,15 @@
 
   <!-- Controls -->
   <div class="controls">
-    <a href="{{ url_for('new_question') }}" class="btn btn-ghost">Skip question</a>
-    <a href="{{ url_for('reset') }}" class="btn btn-ghost">Reset scores</a>
+    <a href="{{ url_for('new_question_route') }}" class="btn btn-ghost">Skip</a>
+    <a href="{{ url_for('reset') }}"              class="btn btn-ghost">Reset scores</a>
   </div>
 
 </div>
 
 <script>
-  // Show result overlay briefly if Flask sent a result via flash or template var
-  const resultStatus = "{{ result | default('') }}";   // 'correct' | 'wrong' | ''
-  const correctAnswer = "{{ correct_answer | default('') }}";
+  const resultStatus = "{{ result | default('') }}";
+  const correctAns   = "{{ correct_answer | default('') }}";
 
   if (resultStatus) {
     const overlay = document.getElementById('result-overlay');
@@ -427,20 +616,17 @@
       icon.textContent = '✗';
       msg.textContent  = 'Not quite…';
       msg.className    = 'result-msg wrong';
-      sub.textContent  = correctAnswer ? `Answer was ${correctAnswer}` : '';
+      sub.textContent  = correctAns ? `Answer was ${correctAns}` : '';
     }
-
     overlay.classList.add('show');
     setTimeout(() => overlay.classList.remove('show'), 1400);
   }
 
-  // Focus input on page load
-  document.getElementById('answer-input')?.focus();
-
-  // Submit on Enter (already works via form, but also clear input nicely)
   document.getElementById('answer-form').addEventListener('submit', () => {
     document.getElementById('eq-blank').classList.add('pop');
   });
+
+  document.getElementById('answer-input')?.focus();
 </script>
 
 </body>

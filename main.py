@@ -5,32 +5,33 @@ app = Flask(__name__)
 app.secret_key = "change-me-in-production"
 
 # ── Digit ranges ─────────────────────────────────────────
-ONE_DIGIT = (1, 9)
-TWO_DIGIT = (10, 99)
-THREE_DIGIT  = (100, 999)
+ONE_DIGIT   = (1, 9)
+TWO_DIGIT   = (10, 99)
+THREE_DIGIT = (100, 999)
 
-LEVELS = ("easy", "medium", "hard", "extra hard", "random")
+LEVELS = ("easy", "medium", "hard", "extra_hard", "random")
+STYLES = ("inline", "stacked")
 
-# Difficulty → which (a_range, b_range) pairs to pick from
 DIGIT_CONFIGS = {
-    "easy":   [(ONE_DIGIT, ONE_DIGIT)],
-    "medium": [(ONE_DIGIT, TWO_DIGIT), (TWO_DIGIT, ONE_DIGIT)],
-    "hard":   [(TWO_DIGIT, TWO_DIGIT)],
-    "extra hard": [(THREE_DIGIT, THREE_DIGIT)],
+    "easy":       [(ONE_DIGIT, ONE_DIGIT)],
+    "medium":     [(ONE_DIGIT, TWO_DIGIT), (TWO_DIGIT, ONE_DIGIT)],
+    "hard":       [(TWO_DIGIT, TWO_DIGIT)],
+    "extra_hard": [(THREE_DIGIT, THREE_DIGIT)],
     "random": [
-        (ONE_DIGIT, ONE_DIGIT),
-        (ONE_DIGIT, TWO_DIGIT),
-        (TWO_DIGIT, ONE_DIGIT),
-        (TWO_DIGIT, TWO_DIGIT),
-        (THREE_DIGIT, THREE_DIGIT)
+        (ONE_DIGIT,   ONE_DIGIT),
+        (ONE_DIGIT,   TWO_DIGIT),
+        (TWO_DIGIT,   ONE_DIGIT),
+        (TWO_DIGIT,   TWO_DIGIT),
+        (THREE_DIGIT, THREE_DIGIT),
     ],
 }
 
 SUBLABEL = {
-    "easy":   "1-digit + 1-digit",
-    "medium": "1-digit + 2-digit",
-    "hard":   "2-digit + 2-digit",
-    "random": "mixed",
+    "easy":       "1-digit + 1-digit",
+    "medium":     "1-digit + 2-digit",
+    "hard":       "2-digit + 2-digit",
+    "extra_hard": "3-digit + 3-digit",
+    "random":     "mixed",
 }
 
 # ── Question generator ───────────────────────────────────
@@ -54,6 +55,7 @@ def init_session():
     session.setdefault("streak", 0)
     session.setdefault("total", 0)
     session.setdefault("difficulty", "easy")
+    session.setdefault("eq_style", "inline")   # ← new
     if "question" not in session:
         session["question"] = new_question(session["difficulty"])
 
@@ -71,6 +73,7 @@ def index():
         streak=session["streak"],
         total=session["total"],
         difficulty=session["difficulty"],
+        eq_style=session["eq_style"],           # ← new
     )
 
 @app.route("/check", methods=["POST"])
@@ -113,10 +116,18 @@ def set_difficulty(level):
         session.modified = True
     return redirect(url_for("index"))
 
+@app.route("/style/<style>")           # ← new route
+def set_style(style):
+    if style in STYLES:
+        session["eq_style"] = style
+        session.modified = True
+    return redirect(url_for("index"))
+
 @app.route("/reset")
 def reset():
     for key in ("correct", "wrong", "streak", "total", "question"):
         session.pop(key, None)
+    # keep eq_style preference across resets
     return redirect(url_for("index"))
 
 if __name__ == "__main__":
