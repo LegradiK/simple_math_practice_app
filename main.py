@@ -9,6 +9,7 @@ ONE_DIGIT   = (1, 9)
 TWO_DIGIT   = (10, 99)
 THREE_DIGIT = (100, 999)
 
+CALC_TYPES = ("+", "-", "x", "/")
 LEVELS = ("easy", "medium", "hard", "extra_hard", "random")
 STYLES = ("inline", "stacked")
 
@@ -108,6 +109,14 @@ def new_question_route():
     session.modified = True
     return redirect(url_for("index"))
 
+@app.route("/type/<calc_type>")
+def set_type(calc_type, level):
+    if type in CALC_TYPES:
+        session["type"] = calc_type
+        session["question"] = new_question(level)
+        session.modified = True
+    return redirect(url_for("index"))
+                    
 @app.route("/difficulty/<level>")
 def set_difficulty(level):
     if level in LEVELS:

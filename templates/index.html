@@ -136,10 +136,8 @@
     .diff-btn .pill-sub {
       font-size: .55rem;
       letter-spacing: .04em;
-      opacity: 0;
       max-height: 0;
-      overflow: hidden;
-      transition: opacity .2s, max-height .2s;
+      transition: max-height .2s;
     }
     .diff-btn.active .pill-sub,
     .diff-btn:hover  .pill-sub { opacity: 1; max-height: 20px; }
@@ -232,20 +230,20 @@
       margin: .5rem 0 2rem;
     }
     .eq-num {
-      font-family: var(--display);
+      font-family: var(--arial);
       font-size: clamp(2.6rem, 10vw, 4rem);
       font-weight: 800;
       line-height: 1;
     }
     .eq-op {
-      font-family: var(--display);
+      font-family: var(--arial);
       font-size: clamp(2rem, 7vw, 3rem);
       font-weight: 700;
       color: var(--accent);
       line-height: 1;
     }
     .eq-equals {
-      font-family: var(--display);
+      font-family: var(--arial);
       font-size: clamp(2rem, 7vw, 3rem);
       font-weight: 700;
       color: var(--muted);
@@ -258,7 +256,7 @@
       border-radius: 8px;
       background: rgba(181,69,27,.05);
       display: flex; align-items: center; justify-content: center;
-      font-family: var(--display);
+      font-family: var(--arial);
       font-size: clamp(1.8rem, 7vw, 3rem);
       font-weight: 700;
       color: var(--accent2);
@@ -274,8 +272,8 @@
     .stacked-wrap {
       display: inline-block;
       margin: .5rem auto 2rem;
-      font-family: var(--display);
-      font-weight: 200;
+      font-family: var(--arial);
+      font-weight: 500;
     }
     .stacked-row {
       display: flex;
@@ -457,6 +455,26 @@
     </div>
   </div>
 
+  <!-- Calculation type selector -->
+  <div class="diff-row">
+    <a href="{{ url_for('set_type', calc_type='addition') }}"
+       class="diff-btn {% if type == 'addition' %}active{% endif %}" data-level="addition">
+      + <span class="pill-sub">Addition</span>
+    </a>
+    <a href="{{ url_for('set_type', calc_type='subtraction') }}"
+       class="diff-btn {% if type == 'subtraction' %}active{% endif %}" data-level="subtraction">
+      - <span class="pill-sub">Subtraction</span>
+    </a>
+    <a href="{{ url_for('set_type', calc_type='multiplication') }}"
+       class="diff-btn {% if type == 'multiplication' %}active{% endif %}" data-level="multiplication">
+      x <span class="pill-sub">Multiplication</span>
+    </a>
+    <a href="{{ url_for('set_type', calc_type='division') }}"
+       class="diff-btn {% if type == 'division' %}active{% endif %}" data-level="division">
+      ÷ <span class="pill-sub">Division</span>
+    </a>
+  </div>
+
   <!-- Difficulty selector -->
   <div class="diff-row">
     <a href="{{ url_for('set_difficulty', level='easy') }}"
@@ -485,7 +503,7 @@
   <div class="style-row">
     <a href="{{ url_for('set_style', style='inline') }}"
        class="style-btn {% if eq_style == 'inline' %}active{% endif %}">
-      <span class="style-preview">5 + 8 = ?</span>
+      <span class="style-preview">X + Y = ?</span>
       Inline
     </a>
     <a href="{{ url_for('set_style', style='stacked') }}"
@@ -503,14 +521,6 @@
       <div class="result-icon" id="result-icon">✓</div>
       <div class="result-msg"  id="result-msg">Correct!</div>
       <div class="result-sub"  id="result-sub"></div>
-    </div>
-
-    <!-- Badge -->
-    <div class="card-badge {{ difficulty | default('easy') }}">
-      <span class="badge-dot"></span>
-      {{ difficulty | default('easy') | replace('_',' ') | title }}
-      &nbsp;·&nbsp;
-      {{ sublabel | default('1-digit + 1-digit') }}
     </div>
 
     <!-- Flash messages -->
