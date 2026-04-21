@@ -5,425 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>MathDrill</title>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
-  <style>
-    :root {
-      --bg:      #FAEBD7;
-      --surface: #F0D9BC;
-      --card:    #FDF6EC;
-      --accent:  #B5451B;
-      --accent2: #2E7D5E;
-      --danger:  #C0392B;
-      --random:  #7B3FA0;
-      --text:    #2C1A0E;
-      --muted:   #8C7260;
-      --border:  #D4B896;
-      --radius:  12px;
-      --mono: 'Space Mono', monospace;
-      --arial:    'Arial', sans-serif;
-      --display: 'Syne', sans-serif;
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--arial);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem 1rem;
-      overflow-x: hidden;
-    }
-
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(44,26,14,.06) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(44,26,14,.06) 1px, transparent 1px);
-      background-size: 40px 40px;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .wrapper {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      max-width: 580px;
-    }
-
-    /* ── Header ── */
-    header {
-      text-align: center;
-      margin-bottom: 2rem;
-      animation: fadeDown .45s ease both;
-    }
-    header h1 {
-      font-family: var(--display);
-      font-size: clamp(2rem, 7vw, 3rem);
-      font-weight: 800;
-      letter-spacing: -1px;
-      color: var(--accent);
-    }
-    header p {
-      color: var(--muted);
-      font-size: .75rem;
-      margin-top: .3rem;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-    }
-
-  
-
-    /* ── Score bar ── */
-    .scorebar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: .7rem 1.2rem;
-      margin-bottom: 1rem;
-      font-size: .7rem;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      animation: fadeDown .45s .08s ease both;
-    }
-    .stat { display: flex; flex-direction: column; align-items: center; gap: .15rem; }
-    .stat .val {
-      font-size: 1.35rem;
-      font-family: var(--display);
-      color: var(--accent);
-    }
-    .stat.wrong  .val { color: var(--danger); }
-    .stat.streak .val { color: var(--accent2); }
-
-    /* ── Row of selectors ── */
-    .diff-row, .style-row {
-      display: flex;
-      gap: .5rem;
-      justify-content: center;
-      flex-wrap: wrap;
-      animation: fadeDown .45s .14s ease both;
-    }
-    .diff-row  { margin-bottom: .6rem; }
-    .style-row { margin-bottom: 1.1rem; }
-
-    .diff-btn, .style-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: .2rem;
-      padding: .45rem 1rem;
-      font-family: var(--arial);
-      font-size: .7rem;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      border-radius: 99px;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      background: var(--surface);
-      cursor: pointer;
-      transition: all .2s;
-      text-decoration: none;
-    }
-    .diff-btn .pill-sub {
-      font-size: .55rem;
-      letter-spacing: .04em;
-      max-height: 0;
-      transition: max-height .2s;
-    }
-    .diff-btn.active .pill-sub,
-    .diff-btn:hover  .pill-sub { opacity: 1; max-height: 20px; }
-
-    .diff-btn[data-level="easy"]:hover,   .diff-btn[data-level="easy"].active   { border-color: var(--accent2); color: var(--accent2); }
-    .diff-btn[data-level="medium"]:hover, .diff-btn[data-level="medium"].active { border-color: var(--accent);  color: var(--accent); }
-    .diff-btn[data-level="hard"]:hover,   .diff-btn[data-level="hard"].active   { border-color: var(--danger);  color: var(--danger); }
-    .diff-btn[data-level="extra_hard"]:hover, .diff-btn[data-level="extra_hard"].active { border-color: #8B0000; color: #8B0000; }
-    .diff-btn[data-level="random"]:hover, .diff-btn[data-level="random"].active { border-color: var(--random);  color: var(--random); }
-
-    /* style toggle buttons */
-    .style-btn:hover, .style-btn.active {
-      border-color: var(--accent);
-      color: var(--accent);
-      background: rgba(181,69,27,.06);
-    }
-    .style-btn .style-preview {
-      font-family: var(--display);
-      font-size: .85rem;
-      font-weight: 700;
-      margin-bottom: .1rem;
-    }
-
-    /* ── Card ── */
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 2.5rem 2rem;
-      text-align: center;
-      animation: fadeDown .45s .2s ease both;
-      position: relative;
-      overflow: hidden;
-    }
-    .card::after {
-      content: '';
-      position: absolute;
-      top: -60px; right: -60px;
-      width: 160px; height: 160px;
-      background: radial-gradient(circle, rgba(181,69,27,.08), transparent 70%);
-      pointer-events: none;
-    }
-
-    .card-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: .5rem;
-      font-size: .62rem;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      padding: .25rem .85rem;
-      border-radius: 99px;
-      margin-bottom: 1.4rem;
-    }
-    .card-badge.easy       { border: 1px solid var(--accent2); color: var(--accent2); }
-    .card-badge.medium     { border: 1px solid var(--accent);  color: var(--accent); }
-    .card-badge.hard       { border: 1px solid var(--danger);  color: var(--danger); }
-    .card-badge.extra_hard { border: 1px solid #8B0000;        color: #8B0000; }
-    .card-badge.random     { border: 1px solid var(--random);  color: var(--random); }
-
-    .badge-dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: currentColor;
-      display: inline-block;
-      animation: pulse 1.4s ease-in-out infinite;
-    }
-
-    /* ── Flash messages ── */
-    .flash {
-      padding: .55rem .9rem;
-      border-radius: 8px;
-      font-size: .78rem;
-      margin-bottom: 1.1rem;
-      text-align: left;
-    }
-    .flash.success { background: rgba(46,125,94,.1);  border: 1px solid var(--accent2); color: var(--accent2); }
-    .flash.error   { background: rgba(192,57,43,.1);  border: 1px solid var(--danger);  color: var(--danger); }
-    .flash.info    { background: rgba(181,69,27,.08); border: 1px solid var(--accent);  color: var(--accent); }
-
-    /* ════════════════════════════════════════
-       INLINE style:  5  +  8  =  [ ? ]
-    ════════════════════════════════════════ */
-    .equation {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: .9rem;
-      flex-wrap: wrap;
-      margin: .5rem 0 2rem;
-    }
-    .eq-num {
-      font-family: var(--arial);
-      font-size: clamp(2.6rem, 10vw, 4rem);
-      font-weight: 800;
-      line-height: 1;
-    }
-    .eq-op {
-      font-family: var(--arial);
-      font-size: clamp(2rem, 7vw, 3rem);
-      font-weight: 700;
-      color: var(--accent);
-      line-height: 1;
-    }
-    .eq-equals {
-      font-family: var(--arial);
-      font-size: clamp(2rem, 7vw, 3rem);
-      font-weight: 700;
-      color: var(--muted);
-      line-height: 1;
-    }
-    .eq-blank {
-      width: clamp(80px, 24vw, 130px);
-      height: clamp(56px, 14vw, 76px);
-      border: 2px solid var(--accent);
-      border-radius: 8px;
-      background: rgba(181,69,27,.05);
-      display: flex; align-items: center; justify-content: center;
-      font-family: var(--arial);
-      font-size: clamp(1.8rem, 7vw, 3rem);
-      font-weight: 700;
-      color: var(--accent2);
-    }
-
-    /* ════════════════════════════════════════
-       STACKED style  (column addition layout)
-          1 2 3
-        +   4 5
-        ───────
-          [ ? ]
-    ════════════════════════════════════════ */
-    .stacked-wrap {
-      display: inline-block;
-      margin: .5rem auto 2rem;
-      font-family: var(--arial);
-      font-weight: 500;
-    }
-    .stacked-row {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      gap: 0;
-      line-height: 1.1;
-    }
-    /* operator column */
-    .stacked-op {
-      font-size: clamp(1.8rem, 7vw, 3rem);
-      color: var(--accent);
-      width: 2.2rem;
-      text-align: left;
-      padding-right: .2rem;
-    }
-    /* digit cells */
-    .stacked-num {
-      font-size: clamp(2.2rem, 9vw, 3.6rem);
-      min-width: 2.4rem;
-      text-align: center;
-    }
-    /* placeholder cell (keeps alignment when num2 is shorter) */
-    .stacked-num.empty { visibility: hidden; }
-
-    /* divider line */
-    .stacked-divider {
-      border: none;
-      border-top: 3px solid var(--text);
-      margin: .4rem 0;
-      width: 100%;
-    }
-
-    /* answer blank in stacked mode */
-    .stacked-blank-row {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      gap: 0;
-      padding-top: .3rem;
-    }
-    .stacked-blank {
-      min-width: 2.4rem;
-      height: clamp(48px, 12vw, 68px);
-      border: 2px solid var(--accent);
-      border-radius: 8px;
-      background: rgba(181,69,27,.05);
-      display: flex; align-items: center; justify-content: center;
-      font-size: clamp(1.8rem, 7vw, 3rem);
-      color: var(--accent2);
-      /* spans all digit columns */
-    }
-
-    /* ── Answer form ── */
-    .answer-form {
-      display: flex;
-      gap: .75rem;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .answer-form input[type="number"] {
-      width: 140px;
-      padding: .85rem 1rem;
-      font-family: var(--display);
-      font-size: 1.5rem;
-      font-weight: 700;
-      text-align: center;
-      background: var(--surface);
-      border: 2px solid var(--border);
-      border-radius: 10px;
-      color: var(--text);
-      transition: border-color .2s;
-      outline: none;
-      -moz-appearance: textfield;
-    }
-    .answer-form input[type="number"]::-webkit-inner-spin-button,
-    .answer-form input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
-    .answer-form input[type="number"]:focus { border-color: var(--accent); }
-
-    /* ── Buttons ── */
-    .btn {
-      padding: .8rem 1.4rem;
-      font-family: var(--arial);
-      font-size: .82rem;
-      font-weight: 700;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: transform .15s, opacity .15s;
-      text-decoration: none;
-      display: inline-block;
-    }
-    .btn:active { transform: scale(.97); }
-    .btn-primary { background: var(--accent); color: #fff; }
-    .btn-primary:hover { opacity: .85; }
-    .btn-ghost {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--muted);
-    }
-    .btn-ghost:hover { border-color: var(--accent2); color: var(--accent2); }
-
-    /* ── Bottom controls ── */
-    .controls {
-      display: flex;
-      gap: .75rem;
-      justify-content: center;
-      margin-top: 1.4rem;
-      flex-wrap: wrap;
-      animation: fadeDown .45s .3s ease both;
-    }
-
-    /* ── Result overlay ── */
-    .result-overlay {
-      display: none;
-      position: absolute;
-      inset: 0;
-      background: rgba(250,235,215,.92);
-      border-radius: var(--radius);
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: .7rem;
-      z-index: 10;
-    }
-    .result-overlay.show { display: flex; }
-    .result-icon { font-size: 3rem; }
-    .result-msg  { font-family: var(--display); font-size: 1.4rem; font-weight: 700; }
-    .result-msg.correct { color: var(--accent2); }
-    .result-msg.wrong   { color: var(--danger); }
-    .result-sub  { font-size: .78rem; color: var(--muted); }
-
-    /* ── Animations ── */
-    @keyframes fadeDown {
-      from { opacity: 0; transform: translateY(-10px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes pulse {
-      0%,100% { opacity: 1; transform: scale(1); }
-      50%      { opacity: .4; transform: scale(.6); }
-    }
-    @keyframes pop {
-      0%  { transform: scale(1); }
-      40% { transform: scale(1.1); }
-      100%{ transform: scale(1); }
-    }
-    .pop { animation: pop .3s ease; }
-  </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
@@ -456,26 +38,45 @@
   </div>
 
   <!-- Calculation type selector -->
-  <div class="diff-row">
+  <div class="type-row">
     <a href="{{ url_for('set_type', calc_type='addition') }}"
-       class="diff-btn {% if type == 'addition' %}active{% endif %}" data-level="addition">
-      + <span class="pill-sub">Addition</span>
+      class="type-btn {% if calc_type == 'addition' %}active{% endif %}" data-level="addition">
+      Addition <span class="type-sub">+</span>
     </a>
     <a href="{{ url_for('set_type', calc_type='subtraction') }}"
-       class="diff-btn {% if type == 'subtraction' %}active{% endif %}" data-level="subtraction">
-      - <span class="pill-sub">Subtraction</span>
+      class="type-btn {% if calc_type == 'subtraction' %}active{% endif %}" data-level="subtraction">
+      Subtraction <span class="type-sub">−</span>
     </a>
     <a href="{{ url_for('set_type', calc_type='multiplication') }}"
-       class="diff-btn {% if type == 'multiplication' %}active{% endif %}" data-level="multiplication">
-      x <span class="pill-sub">Multiplication</span>
+      class="type-btn {% if calc_type == 'multiplication' %}active{% endif %}" data-level="multiplication">
+      Multiplication <span class="type-sub">×</span>
     </a>
     <a href="{{ url_for('set_type', calc_type='division') }}"
-       class="diff-btn {% if type == 'division' %}active{% endif %}" data-level="division">
-      ÷ <span class="pill-sub">Division</span>
+      class="type-btn {% if calc_type == 'division' %}active{% endif %}" data-level="division">
+      Division <span class="type-sub">÷</span>
     </a>
   </div>
 
   <!-- Difficulty selector -->
+  {% if calc_type == "multiplication" %}
+  <div class="diff-row">
+      <a href="{{ url_for('set_difficulty', level='easy') }}"
+        class="diff-btn {% if difficulty == 'easy' %}active{% endif %}" data-level="easy">
+        All<span class="pill-sub">1 - 10</span>
+      </a>
+  </div>
+  {% elif calc_type == "division" %}
+  <div class="diff-row">
+    <a href="{{ url_for('set_difficulty', level='easy') }}"
+       class="diff-btn {% if difficulty == 'easy' %}active{% endif %}" data-level="easy">
+      Easy<span class="pill-sub">1d + 1d</span>
+    </a>
+    <a href="{{ url_for('set_difficulty', level='medium') }}"
+       class="diff-btn {% if difficulty == 'medium' %}active{% endif %}" data-level="medium">
+      Hard<span class="pill-sub">2d + 1d</span>
+    </a>
+  </div>
+  {% else %}
   <div class="diff-row">
     <a href="{{ url_for('set_difficulty', level='easy') }}"
        class="diff-btn {% if difficulty == 'easy' %}active{% endif %}" data-level="easy">
@@ -498,6 +99,7 @@
       Random<span class="pill-sub">all mixed</span>
     </a>
   </div>
+  {% endif %}
 
   <!-- Style toggle: inline vs stacked -->
   <div class="style-row">
@@ -539,7 +141,18 @@
       <span class="eq-op">{{ op | default('+') }}</span>
       <span class="eq-num">{{ num2 | default(8) }}</span>
       <span class="eq-equals">=</span>
-      <div class="eq-blank" id="eq-blank">?</div>
+      <form class="answer-form-inline" method="POST" action="{{ url_for('check_answer') }}" id="answer-form">
+        <input
+          type="number"
+          name="answer"
+          id="answer-input"
+          placeholder="?"
+          autocomplete="off"
+          autofocus
+          required
+        />
+        <button type="submit" class="btn btn-primary">Check →</button>
+      </form>
     </div>
 
     {# ── STACKED layout ── #}
@@ -575,27 +188,22 @@
       <hr class="stacked-divider"/>
 
       {# answer blank spans the full digit width #}
-      <div class="stacked-blank-row">
-        <span class="stacked-op">&nbsp;</span>
-        <div class="stacked-blank" style="width: calc({{ maxlen }} * 2.4rem);">?</div>
-      </div>
+      <form class="answer-form" method="POST" action="{{ url_for('check_answer') }}" id="answer-form">
+        <input
+          type="number"
+          name="answer"
+          id="answer-input"
+          placeholder="?"
+          autocomplete="off"
+          autofocus
+          required
+        />
+        <button type="submit" class="btn btn-primary">Check →</button>
+      </form>
 
     </div>
     {% endif %}
 
-    <!-- Answer form (same for both styles) -->
-    <form class="answer-form" method="POST" action="{{ url_for('check_answer') }}" id="answer-form">
-      <input
-        type="number"
-        name="answer"
-        id="answer-input"
-        placeholder="?"
-        autocomplete="off"
-        autofocus
-        required
-      />
-      <button type="submit" class="btn btn-primary">Check →</button>
-    </form>
 
   </div>
 
