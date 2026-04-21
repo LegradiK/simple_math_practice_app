@@ -14,7 +14,7 @@ MathDrill is designed for young learners at home — preschoolers working on bas
 
 1. **Choose an operation** — tap one of the four buttons: `+` `−` `×` `÷`
 2. **Choose a difficulty level** — the options change depending on the operation selected
-3. **Choose a layout** — Inline (`5 + 8 = ?`) or Column (stacked format, like written maths)
+3. **Choose a layout** — Inline (`X + Y = ?`) or Column (stacked format, like written maths)
 4. **Type the answer** and press **Check**
 5. Instant feedback shows whether the answer was right, along with the full equation
 6. Use **Skip** to move to a new question, or **Reset** to clear the scores
@@ -42,6 +42,9 @@ math_drill/
 │   └── index.html        # Jinja2 template
 ├── static/
 │   └── style.css         # All styling
+├── venv/                 # venv where app dependancies are all installed
+├── .gitignore
+├── data.env
 └── README.md
 ```
 
@@ -53,14 +56,14 @@ math_drill/
 
 ```bash
 # 1. Clone or download the project
-cd math_drill
+cd simple_math_practice_app
 
 # 2. Create and activate a virtual environment
 python -m venv venv
 source venv/bin/activate        # Windows: venv\Scripts\activate
 
 # 3. Install dependencies
-pip install flask
+pip install flask dotenv
 
 # 4. Run the app
 python main.py
