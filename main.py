@@ -102,11 +102,11 @@ def check_answer():
     if user_answer == q["answer"]:
         session["correct"] += 1
         session["streak"]  += 1
-        flash("correct", "result")
+        flash(f"✓ Correct!  {q['num1']} {q['op']} {q['num2']} = {q['answer']}", "success")
     else:
         session["wrong"]  += 1
         session["streak"]  = 0
-        flash(str(q["answer"]), "result_wrong")
+        flash(f"✗ Not quite : {q['num1']} {q['op']} {q['num2']} = {q['answer']}, you answered {user_answer}.", "error")
 
     session["question"] = new_question(session["difficulty"], session["calc_type"])
     session.modified = True

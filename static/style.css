@@ -250,7 +250,7 @@ header p {
     margin-bottom: 1.1rem;
     text-align: left;
 }
-.flash.success { background: rgba(46,125,94,.1);  border: 1px solid var(--accent2); color: var(--accent2); }
+.flash.success { background: rgba(82, 232, 172, 0.1);  border: 1px solid var(--accent2); color: var(--accent2); }
 .flash.error   { background: rgba(192,57,43,.1);  border: 1px solid var(--danger);  color: var(--danger); }
 .flash.info    { background: rgba(181,69,27,.08); border: 1px solid var(--accent);  color: var(--accent); }
 
@@ -383,7 +383,7 @@ header p {
 .answer-form-inline input[type="number"] {
     width: 140px;
     padding: .85rem 1rem;
-    font-family: var(--display);
+    font-family: var(--arial);
     font-size: 1.5rem;
     font-weight: 700;
     text-align: center;
