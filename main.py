@@ -1,8 +1,12 @@
 import random
+import os
 from flask import Flask, render_template, request, redirect, url_for, session, flash
+from dotenv import load_dotenv
+
+load_dotenv("data.env")
 
 app = Flask(__name__)
-app.secret_key = "change-me-in-production"
+app.secret_key = os.getenv("KEY")
 
 ONE_DIGIT   = (1, 9)
 TWO_DIGIT   = (10, 99)
