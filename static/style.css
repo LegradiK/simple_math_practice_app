@@ -172,7 +172,7 @@ header p {
 .diff-btn .pill-sub {
     font-size: .55rem;
     letter-spacing: .04em;
-    max-height: 0;
+    max-height: 20px;
     transition: max-height .2s;
 }
 .diff-btn.active .pill-sub,
